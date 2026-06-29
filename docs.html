@@ -1,0 +1,1396 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Olympic Trades Docs — $OLYMP Protocol</title>
+<meta name="description" content="Official documentation for the Olympic Trades virtual trading protocol on Solana. Token, protocol mechanics, competition rules, and integration guides.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+
+/* ═══════════════════════════════════════════════
+   ROOT — Purple palette
+═══════════════════════════════════════════════ */
+:root {
+  --bg:          #130019;
+  --bg-panel:    #170020;
+  --bg-card:     #1c0029;
+  --bg-hover:    #21002f;
+  --border:      #3a1050;
+  --border-soft: #2a0a3a;
+  --text:        #eeddf8;
+  --text-soft:   #a07cbd;
+  --text-dim:    #5e3a72;
+  --accent:      #cc44ff;
+  --accent-dim:  #8b1fc8;
+  --accent-glow: rgba(204,68,255,0.14);
+  --accent-pale: #e8a8ff;
+  --green:       #22C55E;
+  --amber:       #F59E0B;
+  --red:         #EF4444;
+  --code-bg:     #0f0018;
+  --font-sans:   'Inter', -apple-system, sans-serif;
+  --font-mono:   'JetBrains Mono', 'SF Mono', Consolas, monospace;
+}
+
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-sans);
+  font-size: 15px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+a { color: inherit; text-decoration: none; }
+code, pre { font-family: var(--font-mono); }
+
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #2d0840; border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: #3d1255; }
+
+/* ═══════════════════════════════════════════════
+   TOP BAR
+═══════════════════════════════════════════════ */
+.topbar {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: 56px;
+  z-index: 300;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+  background: rgba(19,0,25,0.92);
+  backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--border);
+}
+.topbar-left { display: flex; align-items: center; gap: 28px; }
+.topbar-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 700;
+  font-size: 15px;
+  color: var(--text);
+  white-space: nowrap;
+}
+.topbar-logo-mark {
+  width: 24px; height: 24px;
+  background: var(--accent);
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: 13px;
+}
+.topbar-badge {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: .05em;
+  color: var(--accent);
+  background: var(--accent-glow);
+  border: 1px solid rgba(204,68,255,0.25);
+  padding: 3px 8px;
+  border-radius: 4px;
+}
+.topbar-nav { display: flex; align-items: center; gap: 2px; }
+.topbar-nav a {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-soft);
+  padding: 7px 12px;
+  border-radius: 6px;
+  transition: all .15s;
+}
+.topbar-nav a:hover { color: var(--text); background: var(--bg-hover); }
+.topbar-nav a.active { color: var(--accent); background: var(--accent-glow); }
+
+.topbar-right { display: flex; align-items: center; gap: 10px; }
+.search-box {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  padding: 7px 10px 7px 12px;
+  width: 220px;
+  transition: border-color .15s;
+}
+.search-box:hover { border-color: #4a1a60; }
+.search-box svg { width: 14px; height: 14px; stroke: var(--text-dim); fill: none; stroke-width: 2; flex-shrink: 0; }
+.search-box input {
+  background: none; border: none; outline: none;
+  color: var(--text); font-size: 13px; width: 100%;
+  font-family: var(--font-sans);
+}
+.search-box input::placeholder { color: var(--text-dim); }
+.kbd {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-dim);
+  background: var(--bg-hover);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 2px 5px;
+  flex-shrink: 0;
+}
+.topbar-icon-btn {
+  width: 34px; height: 34px;
+  display: flex; align-items: center; justify-content: center;
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  background: var(--bg-card);
+  color: var(--text-soft);
+  transition: all .15s;
+  cursor: pointer;
+}
+.topbar-icon-btn:hover { border-color: #4a1a60; color: var(--text); }
+.topbar-icon-btn svg { width: 16px; height: 16px; fill: currentColor; }
+.menu-toggle { display: none; }
+
+/* ═══════════════════════════════════════════════
+   LAYOUT
+═══════════════════════════════════════════════ */
+.layout {
+  display: grid;
+  grid-template-columns: 258px 1fr 218px;
+  padding-top: 56px;
+  max-width: 1480px;
+  margin: 0 auto;
+}
+
+/* ─── SIDEBAR ─────────────────────────────────── */
+.sidebar {
+  position: sticky;
+  top: 56px;
+  height: calc(100vh - 56px);
+  overflow-y: auto;
+  border-right: 1px solid var(--border);
+  padding: 28px 14px 60px;
+}
+.sb-section { margin-bottom: 28px; }
+.sb-section-title {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  padding: 0 12px;
+  margin-bottom: 8px;
+}
+.sb-link {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 7px 12px;
+  border-radius: 6px;
+  font-size: 13.5px;
+  font-weight: 500;
+  color: var(--text-soft);
+  transition: all .15s;
+  position: relative;
+  cursor: pointer;
+}
+.sb-link:hover { color: var(--text); background: var(--bg-hover); }
+.sb-link.active {
+  color: var(--accent);
+  background: var(--accent-glow);
+}
+.sb-link.active::before {
+  content: '';
+  position: absolute;
+  left: -14px; top: 50%;
+  transform: translateY(-50%);
+  width: 2px; height: 16px;
+  background: var(--accent);
+  border-radius: 2px;
+}
+.sb-link svg { width: 15px; height: 15px; flex-shrink: 0; opacity: .7; }
+.sb-tag {
+  margin-left: auto;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  padding: 2px 6px;
+  border-radius: 3px;
+}
+.sb-tag.new  { background: rgba(34,197,94,0.12); color: var(--green); }
+.sb-tag.soon { background: rgba(204,68,255,0.12); color: var(--accent); }
+.sb-sub {
+  margin-left: 24px;
+  border-left: 1px solid var(--border-soft);
+  padding-left: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  margin-top: 2px;
+}
+.sb-sub .sb-link { font-size: 13px; font-weight: 400; padding: 5px 10px; }
+
+/* ─── MAIN ────────────────────────────────────── */
+main {
+  padding: 48px 64px 120px;
+  max-width: 760px;
+  min-width: 0;
+}
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12.5px;
+  color: var(--text-dim);
+  margin-bottom: 18px;
+  font-family: var(--font-mono);
+}
+.breadcrumb .sep { opacity: .5; }
+.breadcrumb .current { color: var(--text-soft); }
+
+h1.page-title {
+  font-size: 32px;
+  font-weight: 700;
+  letter-spacing: -.5px;
+  color: var(--text);
+  margin-bottom: 12px;
+}
+.page-desc {
+  font-size: 16px;
+  color: var(--text-soft);
+  line-height: 1.7;
+  margin-bottom: 36px;
+  max-width: 640px;
+}
+
+.doc-section { margin-bottom: 52px; scroll-margin-top: 80px; }
+.doc-section h2 {
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -.3px;
+  color: var(--text);
+  padding-top: 28px;
+  border-top: 1px solid var(--border-soft);
+  margin-bottom: 14px;
+}
+.doc-section:first-of-type h2 { border-top: none; padding-top: 0; }
+.doc-section h3 {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text);
+  margin: 28px 0 10px;
+}
+.doc-section p {
+  font-size: 14.5px;
+  color: var(--text-soft);
+  line-height: 1.75;
+  margin-bottom: 14px;
+}
+.doc-section p code, .doc-section li code {
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  color: var(--accent-pale);
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+.doc-section ul, .doc-section ol {
+  margin: 0 0 16px 0;
+  padding-left: 0;
+  list-style: none;
+}
+.doc-section li {
+  font-size: 14.5px;
+  color: var(--text-soft);
+  line-height: 1.75;
+  padding-left: 22px;
+  position: relative;
+  margin-bottom: 8px;
+}
+.doc-section ul li::before {
+  content: '';
+  position: absolute;
+  left: 4px; top: 9px;
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  background: var(--accent-dim);
+}
+.doc-section ol { counter-reset: ol-counter; }
+.doc-section ol li { counter-increment: ol-counter; }
+.doc-section ol li::before {
+  content: counter(ol-counter);
+  position: absolute;
+  left: 0; top: 1px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--accent);
+  background: var(--accent-glow);
+  width: 16px; height: 16px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* callouts */
+.callout {
+  display: flex;
+  gap: 12px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--accent);
+  border-radius: 8px;
+  padding: 14px 16px;
+  margin: 20px 0;
+}
+.callout.warn   { border-left-color: var(--amber); }
+.callout.danger { border-left-color: var(--red); }
+.callout.success{ border-left-color: var(--green); }
+.callout-icon { flex-shrink: 0; width: 18px; height: 18px; margin-top: 1px; }
+.callout.info    .callout-icon { color: var(--accent); }
+.callout.warn    .callout-icon { color: var(--amber); }
+.callout.danger  .callout-icon { color: var(--red); }
+.callout.success .callout-icon { color: var(--green); }
+.callout-body { font-size: 13.5px; color: var(--text-soft); line-height: 1.65; }
+.callout-body strong { color: var(--text); font-weight: 600; }
+
+/* code blocks */
+.code-block {
+  background: var(--code-bg);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+  margin: 18px 0;
+}
+.code-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg-panel);
+}
+.code-lang {
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  font-weight: 500;
+  color: var(--text-dim);
+  display: flex; align-items: center; gap: 8px;
+}
+.code-dot { width: 7px; height: 7px; border-radius: 50%; }
+.code-copy {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-dim);
+  background: none; border: none; cursor: pointer;
+  display: flex; align-items: center; gap: 5px;
+  transition: color .15s;
+  padding: 3px 6px; border-radius: 4px;
+}
+.code-copy:hover { color: var(--text); background: var(--bg-hover); }
+.code-copy svg { width: 12px; height: 12px; }
+.code-block pre { padding: 16px 20px; overflow-x: auto; font-size: 13px; line-height: 1.7; }
+.code-block code { color: #C5CDD9; }
+.tok-kw   { color: #e06fff; }
+.tok-type { color: #4EC9B0; }
+.tok-str  { color: #CE9178; }
+.tok-num  { color: #B5CEA8; }
+.tok-com  { color: #5a3a6a; font-style: italic; }
+.tok-fn   { color: #DCDCAA; }
+.tok-var  { color: #d4a8ff; }
+.tok-op   { color: #D4D4D4; }
+.tok-ann  { color: #cc44ff; }
+
+/* tables */
+.doc-table-wrap { overflow-x: auto; margin: 18px 0; }
+table.doc-table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+table.doc-table th {
+  text-align: left;
+  font-weight: 600;
+  color: var(--text-soft);
+  font-size: 11.5px;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg-panel);
+}
+table.doc-table td {
+  padding: 11px 14px;
+  border-bottom: 1px solid var(--border-soft);
+  color: var(--text-soft);
+}
+table.doc-table td:first-child { color: var(--text); font-family: var(--font-mono); font-size: 12.5px; }
+table.doc-table tr:last-child td { border-bottom: none; }
+.table-pill {
+  font-family: var(--font-mono);
+  font-size: 11px; font-weight: 600;
+  padding: 2px 8px; border-radius: 4px;
+  display: inline-block;
+}
+.tp-purple { background: var(--accent-glow); color: var(--accent); }
+.tp-green  { background: rgba(34,197,94,0.12); color: var(--green); }
+.tp-amber  { background: rgba(245,158,11,0.12); color: var(--amber); }
+.tp-red    { background: rgba(239,68,68,0.12); color: var(--red); }
+
+/* contract / address card */
+.contract-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px 20px;
+  margin: 14px 0;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.contract-info { display: flex; align-items: center; gap: 14px; }
+.contract-icon {
+  width: 36px; height: 36px;
+  background: var(--accent-glow);
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  font-size: 17px;
+}
+.contract-label { font-size: 11.5px; color: var(--text-dim); margin-bottom: 3px; }
+.contract-addr { font-family: var(--font-mono); font-size: 13px; color: var(--text); }
+.contract-actions { display: flex; gap: 8px; }
+.contract-btn {
+  font-size: 12px; font-weight: 500;
+  padding: 7px 14px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  color: var(--text-soft);
+  background: var(--bg-panel);
+  cursor: pointer;
+  transition: all .15s;
+  display: flex; align-items: center; gap: 6px;
+}
+.contract-btn:hover { border-color: #4a1a60; color: var(--text); }
+.contract-btn svg { width: 12px; height: 12px; }
+.contract-btn.primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+.contract-btn.primary:hover { background: var(--accent-dim); }
+
+/* stat strip */
+.stat-strip {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1px;
+  background: var(--border);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+  margin: 20px 0;
+}
+.stat-strip-item { background: var(--bg-card); padding: 16px 18px; }
+.ssi-val   { font-family: var(--font-mono); font-size: 20px; font-weight: 600; color: var(--text); }
+.ssi-label { font-size: 11px; color: var(--text-dim); margin-top: 3px; }
+
+/* flow diagram */
+.flow-diagram {
+  display: flex;
+  align-items: center;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+  margin: 20px 0;
+}
+.flow-step {
+  flex: 1;
+  padding: 20px 18px;
+  text-align: center;
+  border-right: 1px solid var(--border);
+  position: relative;
+}
+.flow-step:last-child { border-right: none; }
+.flow-step-icon { font-size: 22px; margin-bottom: 8px; }
+.flow-step-title { font-size: 11.5px; font-weight: 600; color: var(--text); text-transform: uppercase; letter-spacing: .04em; }
+.flow-step-sub { font-size: 11px; color: var(--text-dim); margin-top: 4px; }
+.flow-arrow {
+  font-family: var(--font-mono);
+  font-size: 16px;
+  color: var(--accent-dim);
+  position: absolute;
+  right: -10px; top: 50%;
+  transform: translateY(-50%);
+  z-index: 1;
+}
+
+/* roadmap steps */
+.roadmap-list { display: flex; flex-direction: column; gap: 2px; margin: 18px 0; }
+.roadmap-row {
+  display: grid;
+  grid-template-columns: 48px 1fr;
+  gap: 16px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 14px 18px 14px 14px;
+  align-items: start;
+  transition: border-color .15s;
+}
+.roadmap-row:hover { border-color: #4a1a60; }
+.roadmap-num {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--accent);
+  background: var(--accent-glow);
+  width: 32px; height: 32px;
+  border-radius: 6px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+.roadmap-title { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 4px; }
+.roadmap-desc  { font-size: 13px; color: var(--text-dim); line-height: 1.6; }
+.roadmap-tag {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: .05em;
+  text-transform: uppercase;
+  padding: 2px 7px;
+  border-radius: 3px;
+  margin-top: 6px;
+}
+.rt-launch   { background: rgba(34,197,94,0.12); color: var(--green); }
+.rt-growth   { background: rgba(245,158,11,0.12); color: var(--amber); }
+.rt-protocol { background: var(--accent-glow); color: var(--accent); }
+.rt-compete  { background: rgba(239,68,68,0.12); color: var(--red); }
+
+/* prev/next nav */
+.page-nav {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  margin-top: 56px;
+  padding-top: 24px;
+  border-top: 1px solid var(--border-soft);
+}
+.page-nav-link {
+  flex: 1;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 14px 18px;
+  transition: all .15s;
+  max-width: 280px;
+}
+.page-nav-link:hover { border-color: #4a1a60; background: var(--bg-card); }
+.page-nav-link.next { text-align: right; margin-left: auto; }
+.pnl-dir   { font-size: 11px; color: var(--text-dim); margin-bottom: 4px; }
+.pnl-title { font-size: 13.5px; font-weight: 600; color: var(--text); }
+
+/* ─── RIGHT TOC ───────────────────────────────── */
+.toc {
+  position: sticky;
+  top: 56px;
+  height: calc(100vh - 56px);
+  overflow-y: auto;
+  padding: 48px 20px 60px 8px;
+}
+.toc-title {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  margin-bottom: 14px;
+}
+.toc-link {
+  display: block;
+  font-size: 12.5px;
+  color: var(--text-dim);
+  padding: 5px 0 5px 14px;
+  border-left: 2px solid transparent;
+  transition: all .15s;
+  line-height: 1.4;
+}
+.toc-link:hover { color: var(--text-soft); border-left-color: var(--border); }
+.toc-link.active { color: var(--accent); border-left-color: var(--accent); }
+.toc-divider { height: 1px; background: var(--border-soft); margin: 18px 0; }
+
+/* ─── RESPONSIVE ──────────────────────────────── */
+@media (max-width: 1100px) {
+  .layout { grid-template-columns: 240px 1fr; }
+  .toc { display: none; }
+  main { padding: 40px 40px 100px; }
+}
+@media (max-width: 720px) {
+  .layout { grid-template-columns: 1fr; }
+  .sidebar { display: none; position: fixed; left: 0; top: 56px; width: 260px; z-index: 200; background: var(--bg-panel); border-right: 1px solid var(--border); height: calc(100vh - 56px); }
+  .sidebar.open { display: block; }
+  .menu-toggle { display: flex; }
+  main { padding: 32px 20px 80px; }
+  .stat-strip { grid-template-columns: repeat(2,1fr); }
+  .flow-diagram { flex-direction: column; }
+  .flow-step { border-right: none; border-bottom: 1px solid var(--border); }
+  .flow-step:last-child { border-bottom: none; }
+  .topbar-nav { display: none; }
+  .search-box { width: 160px; }
+}
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+
+</style>
+</head>
+<body>
+
+<!-- ═══ TOP BAR ═══ -->
+<header class="topbar">
+  <div class="topbar-left">
+    <button class="topbar-icon-btn menu-toggle" id="menuToggle" aria-label="Menu">
+      <svg viewBox="0 0 24 24"><path d="M3 6h18M3 12h18M3 18h18" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/></svg>
+    </button>
+    <div class="topbar-logo">
+      
+      Olympic Trades
+    </div>
+    <span class="topbar-badge">$OLYMP</span>
+    <nav class="topbar-nav">
+      <a href="#overview" class="active">Docs</a>
+      <a href="#roadmap">Roadmap</a>
+      <a href="#competition">Compete</a>
+    </nav>
+  </div>
+  <div class="topbar-right">
+    <div class="search-box">
+      <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <input type="text" placeholder="Search docs…">
+      <span class="kbd">⌘K</span>
+    </div>
+    <a href="https://pump.fun" target="_blank" class="topbar-icon-btn" title="Buy on Pump.fun">
+      <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+    </a>
+  </div>
+</header>
+
+<div class="layout">
+
+<!-- ═══ SIDEBAR ═══ -->
+<nav class="sidebar" id="sidebar">
+
+  <div class="sb-section">
+    <div class="sb-section-title">Getting Started</div>
+    <a href="#overview" class="sb-link active">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg>
+      Introduction
+    </a>
+    <a href="#quickstart" class="sb-link">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+      Quickstart
+    </a>
+    <a href="#architecture" class="sb-link">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+      Architecture
+    </a>
+  </div>
+
+  <div class="sb-section">
+    <div class="sb-section-title">Token</div>
+    <a href="#token" class="sb-link">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+      $OLYMP Overview
+    </a>
+    <div class="sb-sub">
+      <a href="#tokenomics" class="sb-link">Tokenomics</a>
+      <a href="#contract-addresses" class="sb-link">Contract Addresses</a>
+    </div>
+  </div>
+
+  <div class="sb-section">
+    <div class="sb-section-title">Protocol</div>
+    <a href="#price-feed" class="sb-link">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+      Price Feed
+    </a>
+    <a href="#virtual-trades" class="sb-link">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 014-4h14M7 23l-4-4 4-4"/><path d="M21 13v2a4 4 0 01-4 4H3"/></svg>
+      Virtual Trades
+    </a>
+    <a href="#scoring" class="sb-link">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M18 9l-5 5-3-3-4 4"/></svg>
+      Scoring & Ranking
+    </a>
+    <a href="#smart-contracts" class="sb-link">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      Smart Contracts
+    </a>
+  </div>
+
+  <div class="sb-section">
+    <div class="sb-section-title">Competition</div>
+    <a href="#competition" class="sb-link">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 21H6a2 2 0 01-2-2v-1a5 5 0 015-5h6a5 5 0 015 5v1a2 2 0 01-2 2h-2M15 3H9M12 3v4M9.5 8.5A3 3 0 0012 11a3 3 0 002.5-2.5"/></svg>
+      Competition Rules
+    </a>
+    <a href="#prize-pool" class="sb-link">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+      Prize Pool
+      <span class="sb-tag soon">Soon</span>
+    </a>
+    <a href="#airdrop" class="sb-link">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 16.7A10 10 0 1112 2.3M22 12l-4 4-4-4"/></svg>
+      Beta Airdrop
+      <span class="sb-tag new">New</span>
+    </a>
+  </div>
+
+  <div class="sb-section">
+    <div class="sb-section-title">Integration</div>
+    <a href="#wallet-integration" class="sb-link">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><path d="M1 10h22"/></svg>
+      Wallet Integration
+    </a>
+    <a href="#api" class="sb-link">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+      API Reference
+    </a>
+  </div>
+
+  <div class="sb-section">
+    <div class="sb-section-title">Governance</div>
+    <a href="#roadmap" class="sb-link">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      Roadmap
+    </a>
+    <a href="#security" class="sb-link">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      Security
+    </a>
+  </div>
+
+</nav>
+
+<!-- ═══ MAIN CONTENT ═══ -->
+<main>
+  <div class="breadcrumb">
+    <span>olympictrades.io</span>
+    <span class="sep">/</span>
+    <span>docs</span>
+    <span class="sep">/</span>
+    <span class="current">introduction</span>
+  </div>
+
+  <h1 class="page-title">Olympic Trades — Protocol Docs</h1>
+  <p class="page-desc">
+    Complete technical reference for the <code>$OLYMP</code> virtual trading protocol on Solana. Covers token mechanics, price feed architecture, competition rules, and integration guides.
+  </p>
+
+  <!-- ─── OVERVIEW ─── -->
+  <div class="doc-section" id="overview">
+    <h2>Introduction</h2>
+    <p>Olympic Trades is a virtual trading protocol deployed on the Solana blockchain. It mirrors live on-chain coin prices in real time and lets users execute simulated trades against those prices — no real capital at risk, fully transparent results on-chain.</p>
+    <p>The protocol is built around a single goal: letting traders <strong>prove skill without losing money</strong>, then compete globally for real prizes. Think of it as the Olympics for on-chain trading — recurring, merit-based, and fully verifiable.</p>
+
+    <div class="stat-strip">
+      <div class="stat-strip-item">
+        <div class="ssi-val">Solana</div>
+        <div class="ssi-label">Network</div>
+      </div>
+      <div class="stat-strip-item">
+        <div class="ssi-val">$OLYMP</div>
+        <div class="ssi-label">Native Token</div>
+      </div>
+      <div class="stat-strip-item">
+        <div class="ssi-val">Real-time</div>
+        <div class="ssi-label">Price Feed</div>
+      </div>
+      <div class="stat-strip-item">
+        <div class="ssi-val">Annual</div>
+        <div class="ssi-label">Competition Cycle</div>
+      </div>
+    </div>
+
+    <h3>What the protocol is not</h3>
+    <p>Olympic Trades is not a trading terminal, a paper trading app, or a prediction market. It is an on-chain protocol where:</p>
+    <ul>
+      <li>Trades are executed virtually against real oracle prices at the exact moment of submission.</li>
+      <li>Positions and P&L are stored in Solana program accounts — not a centralized database.</li>
+      <li>Competition results are provably fair and auditable by anyone with a block explorer.</li>
+    </ul>
+  </div>
+
+  <!-- ─── QUICKSTART ─── -->
+  <div class="doc-section" id="quickstart">
+    <h2>Quickstart</h2>
+    <p>Follow these steps to participate in the Olympic Trades beta once the protocol launches (Roadmap Step 05).</p>
+    <ol>
+      <li>Install a Solana wallet — Phantom or Backpack are recommended.</li>
+      <li>Acquire <code>$OLYMP</code> tokens via the fair launch on Pump.fun or secondary DEX markets.</li>
+      <li>Connect your wallet at <code>app.olympictrades.io</code> and deposit <code>$OLYMP</code> as your entry.</li>
+      <li>Open a virtual position on any supported coin pair. The protocol records your entry price from the oracle feed at the timestamp of your transaction.</li>
+      <li>Close your position at any time. Your P&L is settled on-chain and your leaderboard rank updates in the same block.</li>
+    </ol>
+
+    <div class="callout info">
+      <svg class="callout-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+      <div class="callout-body">The app is not yet live. The quickstart above describes the intended flow for the Beta release. Join the beta tester waitlist to be notified and qualify for the airdrop.</div>
+    </div>
+  </div>
+
+  <!-- ─── ARCHITECTURE ─── -->
+  <div class="doc-section" id="architecture">
+    <h2>Architecture</h2>
+    <p>The protocol is composed of three on-chain layers: a price feed aggregator, a virtual position manager, and a leaderboard state machine. All three are Solana programs written in Rust using the Anchor framework.</p>
+
+    <div class="flow-diagram">
+      <div class="flow-step">
+        <div class="flow-step-icon">📡</div>
+        <div class="flow-step-title">Oracle</div>
+        <div class="flow-step-sub">Pyth / Switchboard</div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-step-icon">⚙️</div>
+        <div class="flow-step-title">Position Manager</div>
+        <div class="flow-step-sub">Anchor program</div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-step-icon">📊</div>
+        <div class="flow-step-title">Leaderboard</div>
+        <div class="flow-step-sub">On-chain state</div>
+      </div>
+      <div class="flow-step">
+        <div class="flow-step-icon">🏆</div>
+        <div class="flow-step-title">Prize Distributor</div>
+        <div class="flow-step-sub">Reward program</div>
+      </div>
+    </div>
+
+    <p>No centralized server touches trade logic. The front-end app reads on-chain state and submits signed transactions; it has no write access to your positions or scores.</p>
+  </div>
+
+  <!-- ─── TOKEN ─── -->
+  <div class="doc-section" id="token">
+    <h2>$OLYMP Overview</h2>
+    <p><code>$OLYMP</code> is the native token of the Olympic Trades ecosystem. It was launched via a fair launch on Pump.fun with no pre-mine, no team allocation at launch, and no private sale. Anyone could buy in at the same conditions from block zero.</p>
+
+    <h3>Token utility</h3>
+    <ul>
+      <li><strong>Protocol access</strong> — holding <code>$OLYMP</code> is required to open virtual positions on the protocol.</li>
+      <li><strong>Competition entry</strong> — competitions require an entry fee paid in <code>$OLYMP</code>, which funds the prize pool.</li>
+      <li><strong>Governance</strong> — future on-chain voting over competition parameters, fee rates, and treasury grants.</li>
+      <li><strong>Airdrop eligibility</strong> — beta testers who hold <code>$OLYMP</code> during the testing window qualify for additional airdrop rewards.</li>
+    </ul>
+  </div>
+
+  <!-- ─── TOKENOMICS ─── -->
+  <div class="doc-section" id="tokenomics">
+    <h2>Tokenomics</h2>
+    <p>Because <code>$OLYMP</code> launched via Pump.fun's fair launch mechanism, the full initial supply entered circulation through the bonding curve. There are no locked team tokens, no vesting schedules, and no seed-round allocations.</p>
+
+    <div class="doc-table-wrap">
+      <table class="doc-table">
+        <thead>
+          <tr><th>Parameter</th><th>Value</th><th>Notes</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Launch type</td><td>Fair launch</td><td>Pump.fun bonding curve</td></tr>
+          <tr><td>Team allocation</td><td>0%</td><td>No pre-mine</td></tr>
+          <tr><td>Private sale</td><td>None</td><td>Open to all from block 0</td></tr>
+          <tr><td>Competition prize pool</td><td>Entry fees</td><td>100% from participant entries</td></tr>
+          <tr><td>Treasury</td><td>Community governed</td><td>Post-$1M market cap milestone</td></tr>
+          <tr><td>Network</td><td>Solana (SPL token)</td><td>—</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout warn">
+      <svg class="callout-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      <div class="callout-body"><strong>$OLYMP is not an investment product.</strong> It is a utility token. Do not buy it expecting financial returns. Protocol access, competition entry, and governance are the intended uses.</div>
+    </div>
+  </div>
+
+  <!-- ─── CONTRACT ADDRESSES ─── -->
+  <div class="doc-section" id="contract-addresses">
+    <h2>Contract Addresses</h2>
+    <p>All official addresses will be published here at launch. Do not interact with any contract claiming to be <code>$OLYMP</code> before the official announcement.</p>
+
+    <div class="contract-card">
+      <div class="contract-info">
+        <div class="contract-icon">🪙</div>
+        <div>
+          <div class="contract-label">$OLYMP SPL Token Mint</div>
+          <div class="contract-addr">TBA — announced at fair launch</div>
+        </div>
+      </div>
+      <div class="contract-actions">
+        <button class="contract-btn primary">View on Solscan</button>
+      </div>
+    </div>
+
+    <div class="contract-card">
+      <div class="contract-info">
+        <div class="contract-icon">⚙️</div>
+        <div>
+          <div class="contract-label">Position Manager Program</div>
+          <div class="contract-addr">TBA — deployed at Protocol Release (Step 05)</div>
+        </div>
+      </div>
+      <div class="contract-actions">
+        <button class="contract-btn primary">View on Solscan</button>
+      </div>
+    </div>
+
+    <div class="contract-card">
+      <div class="contract-info">
+        <div class="contract-icon">🏆</div>
+        <div>
+          <div class="contract-label">Prize Distributor Program</div>
+          <div class="contract-addr">TBA — deployed at Protocol Release (Step 05)</div>
+        </div>
+      </div>
+      <div class="contract-actions">
+        <button class="contract-btn primary">View on Solscan</button>
+      </div>
+    </div>
+
+    <div class="callout danger">
+      <svg class="callout-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      <div class="callout-body"><strong>No contracts are deployed yet.</strong> Any token or program claiming to be Olympic Trades prior to the official launch announcement is a scam. Verify all addresses through our official channels only.</div>
+    </div>
+  </div>
+
+  <!-- ─── PRICE FEED ─── -->
+  <div class="doc-section" id="price-feed">
+    <h2>Price Feed</h2>
+    <p>The protocol consumes real-time price data via Solana's leading oracle networks. Every virtual trade is priced at the oracle's reported value at the exact slot your transaction lands — the same price a real DEX swap would see.</p>
+
+    <h3>Supported oracle sources</h3>
+    <div class="doc-table-wrap">
+      <table class="doc-table">
+        <thead><tr><th>Oracle</th><th>Update Frequency</th><th>Used For</th></tr></thead>
+        <tbody>
+          <tr><td>Pyth Network</td><td>~400ms</td><td>Primary price source for all pairs</td></tr>
+          <tr><td>Switchboard</td><td>~1s</td><td>Fallback / cross-validation</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Price staleness protection</h3>
+    <p>If a price feed has not updated within a configurable staleness window (default: 10 seconds), the position manager will reject new trade opens for that pair until a fresh price is confirmed. This prevents manipulation via stale oracle data.</p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <div class="code-lang"><span class="code-dot" style="background:#e06fff"></span>rust</div>
+        <button class="code-copy" onclick="copyCode(this)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+          Copy
+        </button>
+      </div>
+      <pre><code><span class="tok-kw">pub fn</span> <span class="tok-fn">validate_price</span>(feed: &amp;<span class="tok-type">PriceFeed</span>, clock: &amp;<span class="tok-type">Clock</span>) -&gt; <span class="tok-type">Result</span>&lt;<span class="tok-type">i64</span>&gt; {
+    <span class="tok-kw">let</span> <span class="tok-var">price</span> = feed.<span class="tok-fn">get_price_no_older_than</span>(
+        &amp;clock, <span class="tok-num">10</span> <span class="tok-com">// max staleness in seconds</span>
+    ).<span class="tok-fn">ok_or</span>(<span class="tok-type">OlympError</span>::<span class="tok-var">StalePriceFeed</span>)?;
+    <span class="tok-type">Ok</span>(price.price)
+}</code></pre>
+    </div>
+  </div>
+
+  <!-- ─── VIRTUAL TRADES ─── -->
+  <div class="doc-section" id="virtual-trades">
+    <h2>Virtual Trades</h2>
+    <p>A virtual trade is a signed Solana transaction that instructs the Position Manager program to record a synthetic long or short position at the current oracle price. No real asset is bought or sold.</p>
+
+    <h3>Opening a position</h3>
+    <div class="code-block">
+      <div class="code-header">
+        <div class="code-lang"><span class="code-dot" style="background:#DCDCAA"></span>typescript</div>
+        <button class="code-copy" onclick="copyCode(this)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+          Copy
+        </button>
+      </div>
+      <pre><code><span class="tok-kw">import</span> { <span class="tok-var">OlympClient</span> } <span class="tok-kw">from</span> <span class="tok-str">'@olymp/sdk'</span>;
+
+<span class="tok-kw">const</span> <span class="tok-var">client</span> = <span class="tok-kw">new</span> <span class="tok-fn">OlympClient</span>({ wallet, connection });
+
+<span class="tok-com">// Open a virtual long on SOL/USDC</span>
+<span class="tok-kw">const</span> <span class="tok-var">tx</span> = <span class="tok-kw">await</span> client.<span class="tok-fn">openPosition</span>({
+  pair:      <span class="tok-str">'SOL/USDC'</span>,
+  direction: <span class="tok-str">'long'</span>,
+  size:      <span class="tok-num">1000</span>, <span class="tok-com">// virtual USDC notional</span>
+});
+<span class="tok-kw">await</span> tx.<span class="tok-fn">confirm</span>();</code></pre>
+    </div>
+
+    <h3>Closing a position</h3>
+    <div class="code-block">
+      <div class="code-header">
+        <div class="code-lang"><span class="code-dot" style="background:#DCDCAA"></span>typescript</div>
+        <button class="code-copy" onclick="copyCode(this)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+          Copy
+        </button>
+      </div>
+      <pre><code><span class="tok-com">// Close position — P&L settled on-chain at this block's oracle price</span>
+<span class="tok-kw">const</span> <span class="tok-var">result</span> = <span class="tok-kw">await</span> client.<span class="tok-fn">closePosition</span>({ positionId: <span class="tok-var">tx</span>.positionId });
+console.<span class="tok-fn">log</span>(<span class="tok-str">`P&amp;L: ${</span><span class="tok-var">result</span>.pnl<span class="tok-str">} virtual USDC`</span>);</code></pre>
+    </div>
+
+    <h3>Supported pairs (Beta)</h3>
+    <p>At Beta launch, the following pairs will be available. Additional pairs are added by governance vote.</p>
+    <div class="doc-table-wrap">
+      <table class="doc-table">
+        <thead><tr><th>Pair</th><th>Direction</th><th>Oracle</th><th>Status</th></tr></thead>
+        <tbody>
+          <tr><td>SOL/USDC</td><td>Long / Short</td><td>Pyth</td><td><span class="table-pill tp-green">Live (Beta)</span></td></tr>
+          <tr><td>BTC/USDC</td><td>Long / Short</td><td>Pyth</td><td><span class="table-pill tp-green">Live (Beta)</span></td></tr>
+          <tr><td>ETH/USDC</td><td>Long / Short</td><td>Pyth</td><td><span class="table-pill tp-green">Live (Beta)</span></td></tr>
+          <tr><td>OLYMP/USDC</td><td>Long / Short</td><td>Switchboard</td><td><span class="table-pill tp-amber">Planned</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ─── SCORING ─── -->
+  <div class="doc-section" id="scoring">
+    <h2>Scoring & Ranking</h2>
+    <p>Each participant's leaderboard score is a composite metric — raw P&L alone does not determine rank. This prevents participants from simply sizing up a single trade.</p>
+
+    <div class="doc-table-wrap">
+      <table class="doc-table">
+        <thead><tr><th>Metric</th><th>Weight</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td>Return on notional</td><td>40%</td><td>Total virtual P&L ÷ total notional traded</td></tr>
+          <tr><td>Win rate</td><td>25%</td><td>Closed winning trades ÷ total closed trades</td></tr>
+          <tr><td>Sharpe ratio</td><td>20%</td><td>Risk-adjusted return over the competition window</td></tr>
+          <tr><td>Trade count</td><td>15%</td><td>Minimum 10 trades required to qualify for prizes</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p>The composite score is computed by an on-chain Solana program at the end of each competition epoch. The computation is deterministic and verifiable — anyone can replay the calculation from raw on-chain position data.</p>
+  </div>
+
+  <!-- ─── SMART CONTRACTS ─── -->
+  <div class="doc-section" id="smart-contracts">
+    <h2>Smart Contracts</h2>
+    <p>All protocol logic lives in Anchor programs on Solana. There are no admin keys that can freeze your positions or alter your score.</p>
+
+    <h3>Program accounts</h3>
+    <div class="doc-table-wrap">
+      <table class="doc-table">
+        <thead><tr><th>Account</th><th>Type</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td>CompetitionState</td><td>PDA</td><td>Global competition config, epoch start/end, prize pool balance</td></tr>
+          <tr><td>ParticipantAccount</td><td>PDA per wallet</td><td>Score, open positions, trade history hash</td></tr>
+          <tr><td>Position</td><td>PDA per trade</td><td>Entry price, size, direction, open/closed flag, P&L</td></tr>
+          <tr><td>PrizePool</td><td>Token account</td><td>Holds $OLYMP entry fees until epoch ends</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ─── COMPETITION ─── -->
+  <div class="doc-section" id="competition">
+    <h2>Competition Rules</h2>
+    <p>Olympic Trades competitions run in fixed-length epochs. The first competition launches after the Beta Testing Campaign (Roadmap Step 07). Subsequent competitions are annual.</p>
+
+    <h3>Eligibility</h3>
+    <ul>
+      <li>Wallet must hold <code>$OLYMP</code> tokens at the snapshot block before epoch start.</li>
+      <li>Entry fee paid in <code>$OLYMP</code> — amount announced per-epoch.</li>
+      <li>Minimum 10 closed trades during the epoch to qualify for prize distribution.</li>
+      <li>No bot restrictions — algorithmic trading is permitted and expected.</li>
+    </ul>
+
+    <h3>Competition lifecycle</h3>
+    <ol>
+      <li><strong>Registration window</strong> — wallets pay the entry fee and register their ParticipantAccount.</li>
+      <li><strong>Trading epoch</strong> — all registered wallets can open and close virtual positions.</li>
+      <li><strong>Scoring settlement</strong> — on-chain program computes final scores at epoch close.</li>
+      <li><strong>Prize distribution</strong> — PrizeDistributor program pays out <code>$OLYMP</code> to ranked winners automatically.</li>
+    </ol>
+
+    <div class="callout success">
+      <svg class="callout-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+      <div class="callout-body">Prize distribution is trustless — winners receive funds directly from the on-chain PrizePool account without any manual admin step.</div>
+    </div>
+  </div>
+
+  <!-- ─── PRIZE POOL ─── -->
+  <div class="doc-section" id="prize-pool">
+    <h2>Prize Pool</h2>
+    <p>The prize pool for each competition epoch is funded entirely by participant entry fees. There is no treasury subsidy for the first competition — what participants put in is what winners take out (minus a small protocol fee for ongoing development).</p>
+
+    <div class="doc-table-wrap">
+      <table class="doc-table">
+        <thead><tr><th>Allocation</th><th>Share</th><th>Recipient</th></tr></thead>
+        <tbody>
+          <tr><td>1st Place</td><td>40%</td><td>Highest composite score</td></tr>
+          <tr><td>2nd Place</td><td>20%</td><td>Second highest</td></tr>
+          <tr><td>3rd Place</td><td>10%</td><td>Third highest</td></tr>
+          <tr><td>Top 4–10</td><td>20%</td><td>Split equally among ranks 4–10</td></tr>
+          <tr><td>Protocol fee</td><td>10%</td><td>Olympic Trades treasury (community governed)</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p>Exact prize pool size depends on total participant count and entry fee. Announced per-epoch once registration opens.</p>
+  </div>
+
+  <!-- ─── AIRDROP ─── -->
+  <div class="doc-section" id="airdrop">
+    <h2>Beta Airdrop</h2>
+    <p>Beta testers who actively use the protocol during the testing window (Roadmap Step 06) will receive a <code>$OLYMP</code> airdrop proportional to their participation.</p>
+
+    <h3>How to qualify</h3>
+    <ul>
+      <li>Hold <code>$OLYMP</code> at the snapshot block when beta registration opens.</li>
+      <li>Open and close at least 5 virtual positions during the beta window.</li>
+      <li>Submit at least one bug report or feedback form via the official beta portal.</li>
+      <li>Do not use bots that spam transactions with no trading intent — this will disqualify your wallet.</li>
+    </ul>
+
+    <h3>Airdrop scoring</h3>
+    <p>Airdrop amounts are weighted by trade count, feedback quality score (rated by the team), and <code>$OLYMP</code> holdings at snapshot. Heavy traders who also file detailed feedback receive the highest allocations.</p>
+
+    <div class="callout info">
+      <svg class="callout-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+      <div class="callout-body">Beta registration dates will be announced on our official Telegram and Twitter/X channels. Follow those accounts to avoid missing the snapshot block.</div>
+    </div>
+  </div>
+
+  <!-- ─── WALLET INTEGRATION ─── -->
+  <div class="doc-section" id="wallet-integration">
+    <h2>Wallet Integration</h2>
+    <p>Olympic Trades supports any Solana wallet via standard wallet-adapter interfaces. We recommend Phantom or Backpack for end users. For programmatic integration, use the <code>@olymp/sdk</code> package (published at protocol launch).</p>
+
+    <div class="code-block">
+      <div class="code-header">
+        <div class="code-lang"><span class="code-dot" style="background:#3B82F6"></span>bash</div>
+        <button class="code-copy" onclick="copyCode(this)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+          Copy
+        </button>
+      </div>
+      <pre><code>npm install @olymp/sdk @solana/wallet-adapter-react</code></pre>
+    </div>
+
+    <div class="code-block">
+      <div class="code-header">
+        <div class="code-lang"><span class="code-dot" style="background:#DCDCAA"></span>typescript</div>
+        <button class="code-copy" onclick="copyCode(this)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+          Copy
+        </button>
+      </div>
+      <pre><code><span class="tok-kw">import</span> { <span class="tok-var">OlympClient</span> } <span class="tok-kw">from</span> <span class="tok-str">'@olymp/sdk'</span>;
+<span class="tok-kw">import</span> { <span class="tok-var">useWallet</span>, <span class="tok-var">useConnection</span> } <span class="tok-kw">from</span> <span class="tok-str">'@solana/wallet-adapter-react'</span>;
+
+<span class="tok-kw">function</span> <span class="tok-fn">MyTradingApp</span>() {
+  <span class="tok-kw">const</span> { wallet } = <span class="tok-fn">useWallet</span>();
+  <span class="tok-kw">const</span> { connection } = <span class="tok-fn">useConnection</span>();
+  <span class="tok-kw">const</span> <span class="tok-var">olymp</span> = <span class="tok-kw">new</span> <span class="tok-fn">OlympClient</span>({ wallet, connection });
+  <span class="tok-com">// olymp.openPosition(), olymp.closePosition(), olymp.getScore()</span>
+}</code></pre>
+    </div>
+  </div>
+
+  <!-- ─── API ─── -->
+  <div class="doc-section" id="api">
+    <h2>API Reference</h2>
+    <p>A read-only REST API will be available at <code>api.olympictrades.io/v1</code> from the Beta launch. All write operations must go through signed on-chain transactions.</p>
+
+    <div class="doc-table-wrap">
+      <table class="doc-table">
+        <thead><tr><th>Endpoint</th><th>Method</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td>/leaderboard</td><td><span class="table-pill tp-green">GET</span></td><td>Current epoch leaderboard, paginated.</td></tr>
+          <tr><td>/leaderboard/:wallet</td><td><span class="table-pill tp-green">GET</span></td><td>Score and rank for a specific wallet.</td></tr>
+          <tr><td>/positions/:wallet</td><td><span class="table-pill tp-green">GET</span></td><td>All open and closed positions for a wallet.</td></tr>
+          <tr><td>/competition/current</td><td><span class="table-pill tp-green">GET</span></td><td>Current epoch metadata — start, end, entry fee, prize pool.</td></tr>
+          <tr><td>/price/:pair</td><td><span class="table-pill tp-green">GET</span></td><td>Latest oracle price for a supported pair.</td></tr>
+          <tr><td>/token/stats</td><td><span class="table-pill tp-green">GET</span></td><td>$OLYMP circulating supply, holders, market cap.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ─── ROADMAP ─── -->
+  <div class="doc-section" id="roadmap">
+    <h2>Roadmap</h2>
+    <p>Eight sequential milestones from launch to annual competitions. Each stage unlocks the next.</p>
+
+    <div class="roadmap-list">
+      <div class="roadmap-row">
+        <div class="roadmap-num">01</div>
+        <div>
+          <div class="roadmap-title">Fair Launch on Pump.fun + Investment Stage</div>
+          <div class="roadmap-desc">$OLYMP launches on Pump.fun. No pre-mine, no private allocation. Bonding curve open to all. Proceeds fund protocol development and marketing.</div>
+          <span class="roadmap-tag rt-launch">Launch</span>
+        </div>
+      </div>
+      <div class="roadmap-row">
+        <div class="roadmap-num">02</div>
+        <div>
+          <div class="roadmap-title">Marketing Campaign</div>
+          <div class="roadmap-desc">Targeted push across Crypto Twitter, Telegram, and Solana community channels. KOL partnerships and educational content about the protocol concept.</div>
+          <span class="roadmap-tag rt-growth">Growth</span>
+        </div>
+      </div>
+      <div class="roadmap-row">
+        <div class="roadmap-num">03</div>
+        <div>
+          <div class="roadmap-title">Collaborations</div>
+          <div class="roadmap-desc">Partnerships with Solana-native projects, trading communities, and DeFi tooling providers. Integration of $OLYMP into complementary ecosystems.</div>
+          <span class="roadmap-tag rt-growth">Growth</span>
+        </div>
+      </div>
+      <div class="roadmap-row">
+        <div class="roadmap-num">04</div>
+        <div>
+          <div class="roadmap-title">$1M Market Cap Milestone</div>
+          <div class="roadmap-desc">Target market cap that unlocks the protocol development treasury. Community vote on allocation between engineering, prize pools, and liquidity provision.</div>
+          <span class="roadmap-tag rt-growth">Milestone</span>
+        </div>
+      </div>
+      <div class="roadmap-row">
+        <div class="roadmap-num">05</div>
+        <div>
+          <div class="roadmap-title">Protocol Release</div>
+          <div class="roadmap-desc">Core on-chain programs deployed to Solana mainnet. Price feed integration, position management, and leaderboard state all go live. SDK published.</div>
+          <span class="roadmap-tag rt-protocol">Protocol</span>
+        </div>
+      </div>
+      <div class="roadmap-row">
+        <div class="roadmap-num">06</div>
+        <div>
+          <div class="roadmap-title">Beta Testing Campaign + Airdrop</div>
+          <div class="roadmap-desc">Community stress-test of the protocol. Active testers receive $OLYMP airdrops weighted by trade count, feedback quality, and holdings at snapshot.</div>
+          <span class="roadmap-tag rt-protocol">Protocol</span>
+        </div>
+      </div>
+      <div class="roadmap-row">
+        <div class="roadmap-num">07</div>
+        <div>
+          <div class="roadmap-title">First Olympic Trades Competition</div>
+          <div class="roadmap-desc">Inaugural competition epoch. Entry fees fund the prize pool. Winners determined by composite score. Prize distribution is fully on-chain and trustless.</div>
+          <span class="roadmap-tag rt-compete">Compete</span>
+        </div>
+      </div>
+      <div class="roadmap-row">
+        <div class="roadmap-num">08</div>
+        <div>
+          <div class="roadmap-title">Alpha Release + Annual Competitions</div>
+          <div class="roadmap-desc">Full alpha ships with expanded pair support, bracket tournaments, and DAO governance. Olympic Trades Competitions become a recurring annual event.</div>
+          <span class="roadmap-tag rt-compete">Compete</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── SECURITY ─── -->
+  <div class="doc-section" id="security">
+    <h2>Security</h2>
+    <p>All core on-chain programs will undergo independent security audits before mainnet deployment. Audit reports will be linked here once complete.</p>
+
+    <h3>Admin key policy</h3>
+    <p>No admin key can modify your open positions, alter your score, or withdraw from the prize pool. The only privileged operations reserved for the upgrade authority are: deploying program upgrades (which will be transferred to a multisig before the first competition) and initializing new epoch accounts.</p>
+
+    <h3>Bug bounty</h3>
+    <p>A bug bounty program will be active from Beta launch. Critical vulnerabilities in on-chain programs are eligible for rewards in <code>$OLYMP</code>. Details published in the beta announcement.</p>
+
+    <div class="callout danger">
+      <svg class="callout-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      <div class="callout-body"><strong>No audit has been completed yet.</strong> Programs are not deployed. Do not send funds to any address claiming to be Olympic Trades prior to the official launch and audit publication.</div>
+    </div>
+  </div>
+
+  <!-- ─── PAGE NAV ─── -->
+  <div class="page-nav">
+    <a href="#overview" class="page-nav-link prev">
+      <div class="pnl-dir">← Previous</div>
+      <div class="pnl-title">Introduction</div>
+    </a>
+    <a href="#competition" class="page-nav-link next">
+      <div class="pnl-dir">Next →</div>
+      <div class="pnl-title">Competition Rules</div>
+    </a>
+  </div>
+
+</main>
+
+<!-- ═══ RIGHT TOC ═══ -->
+<aside class="toc">
+  <div class="toc-title">On this page</div>
+  <a href="#overview"          class="toc-link active">Introduction</a>
+  <a href="#quickstart"        class="toc-link">Quickstart</a>
+  <a href="#architecture"      class="toc-link">Architecture</a>
+  <a href="#token"             class="toc-link">$OLYMP Overview</a>
+  <a href="#tokenomics"        class="toc-link">Tokenomics</a>
+  <a href="#contract-addresses" class="toc-link">Contract Addresses</a>
+  <a href="#price-feed"        class="toc-link">Price Feed</a>
+  <a href="#virtual-trades"    class="toc-link">Virtual Trades</a>
+  <a href="#scoring"           class="toc-link">Scoring & Ranking</a>
+  <a href="#smart-contracts"   class="toc-link">Smart Contracts</a>
+  <a href="#competition"       class="toc-link">Competition Rules</a>
+  <a href="#prize-pool"        class="toc-link">Prize Pool</a>
+  <a href="#airdrop"           class="toc-link">Beta Airdrop</a>
+  <a href="#wallet-integration" class="toc-link">Wallet Integration</a>
+  <a href="#api"               class="toc-link">API Reference</a>
+  <a href="#roadmap"           class="toc-link">Roadmap</a>
+  <a href="#security"          class="toc-link">Security</a>
+  <div class="toc-divider"></div>
+  <div style="font-size:11px; color:var(--text-dim); line-height:1.6;">
+    Docs v0.1 · Pre-launch<br>
+    Built on Solana
+  </div>
+</aside>
+
+</div><!-- /.layout -->
+
+<script>
+  // Mobile sidebar toggle
+  document.getElementById('menuToggle')?.addEventListener('click', () => {
+    document.getElementById('sidebar').classList.toggle('open');
+  });
+
+  // Copy code buttons
+  function copyCode(btn) {
+    const code = btn.closest('.code-block').querySelector('code').innerText;
+    navigator.clipboard.writeText(code).then(() => {
+      const orig = btn.innerHTML;
+      btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> Copied';
+      setTimeout(() => { btn.innerHTML = orig; }, 1600);
+    });
+  }
+
+  // Scrollspy — right TOC + left sidebar
+  const tocLinks = document.querySelectorAll('.toc-link');
+  const sbLinks  = document.querySelectorAll('.sb-link');
+  const sections = document.querySelectorAll('.doc-section');
+
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (!entry.isIntersecting) return;
+      const id = entry.target.id;
+      // right TOC
+      tocLinks.forEach(l => l.classList.toggle('active', l.getAttribute('href') === `#${id}`));
+      // left sidebar
+      sbLinks.forEach(l => l.classList.toggle('active', l.getAttribute('href') === `#${id}`));
+    });
+  }, { rootMargin: '-72px 0px -70% 0px' });
+
+  sections.forEach(s => observer.observe(s));
+</script>
+</body>
+</html>
